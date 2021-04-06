@@ -39,8 +39,8 @@ enum custom_keycodes {
 #define ALT_BS ALT_T(KC_BSPC)
 
 enum user_macro {
-    UM_SPC,
-    UM_ENT,
+  UM_SPC,
+  UM_ENT,
 };
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
@@ -234,11 +234,20 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 #endif
 
 layer_state_t layer_state_set_user(layer_state_t state) {
-    return update_tri_layer_state(state, _MOVE, _SYMBOL, _ADJUST);
+  return update_tri_layer_state(state, _MOVE, _SYMBOL, _ADJUST);
 }
 
+static bool ctrl_pressed = false;
+static bool exceptionaly_ctrl_layer_pressed = false;
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
   switch (keycode) {
+    case KC_LCTL:
+      if (record->event.pressed) {
+          ctrl_pressed = true;
+      } else {
+          ctrl_pressed = false;
+      }
+      break;
     case QWERTY:
       if (record->event.pressed) {
         print("mode just switched to qwerty and this is a huge string\n");
@@ -303,6 +312,27 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
       }
       return false;
       break;
+    default:
+      if (ctrl_pressed || exceptionaly_ctrl_layer_pressed) {
+        switch (keycode) {
+          case KC_H:
+            if (record->event.pressed) {
+              unregister_code(KC_LCTL);
+              register_code(KC_BSPC);
+              exceptionaly_ctrl_layer_pressed = true;
+            } else {
+              if (ctrl_pressed) {
+                register_code(KC_LCTL);
+              } else {
+                unregister_code(KC_LCTL);
+              }
+              unregister_code(KC_BSPC);
+              exceptionaly_ctrl_layer_pressed = false;
+            }
+            return false;
+            break;
+        }
+      }
   }
   return true;
 }
@@ -378,22 +408,22 @@ void dip_switch_update_user(uint8_t index, bool active) {
 
 void matrix_scan_user(void) {
 #ifdef AUDIO_ENABLE
-    if (muse_mode) {
-        if (muse_counter == 0) {
-            uint8_t muse_note = muse_offset + SCALE[muse_clock_pulse()];
-            if (muse_note != last_muse_note) {
-                stop_note(compute_freq_for_midi_note(last_muse_note));
-                play_note(compute_freq_for_midi_note(muse_note), 0xF);
-                last_muse_note = muse_note;
-            }
-        }
-        muse_counter = (muse_counter + 1) % muse_tempo;
-    } else {
-        if (muse_counter) {
-            stop_all_notes();
-            muse_counter = 0;
-        }
+  if (muse_mode) {
+    if (muse_counter == 0) {
+      uint8_t muse_note = muse_offset + SCALE[muse_clock_pulse()];
+      if (muse_note != last_muse_note) {
+        stop_note(compute_freq_for_midi_note(last_muse_note));
+        play_note(compute_freq_for_midi_note(muse_note), 0xF);
+        last_muse_note = muse_note;
+      }
     }
+    muse_counter = (muse_counter + 1) % muse_tempo;
+  } else {
+    if (muse_counter) {
+      stop_all_notes();
+      muse_counter = 0;
+    }
+  }
 #endif
 }
 
@@ -409,14 +439,14 @@ bool music_mask_user(uint16_t keycode) {
 
 const macro_t *action_get_macro(keyrecord_t *record, uint8_t id, uint8_t opt)
 {
-    switch(id) {
-        case UM_SPC: {
-            return MACRO_TAP_HOLD_LAYER( record, MACRO(TYPE(KC_SPC), END), _MOVE );
-        } break;
+  switch(id) {
+    case UM_SPC: {
+      return MACRO_TAP_HOLD_LAYER( record, MACRO(TYPE(KC_SPC), END), _MOVE );
+    } break;
 
-        case UM_ENT: {
-            return MACRO_TAP_HOLD_LAYER( record, MACRO(TYPE(KC_ENT), END), _SYMBOL );
-        } break;
-    }
-    return MACRO_NONE;
+    case UM_ENT: {
+      return MACRO_TAP_HOLD_LAYER( record, MACRO(TYPE(KC_ENT), END), _SYMBOL );
+    } break;
+  }
+  return MACRO_NONE;
 };
