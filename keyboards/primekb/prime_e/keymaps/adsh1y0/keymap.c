@@ -37,7 +37,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     [_BASE] = LAYOUT(
 		KC_TAB,   KC_Q,      KC_W,      KC_E,      KC_R,       KC_T,            KC_Y,      KC_U,     KC_I,     KC_O,      KC_P,       KC_LBRC,  KC_RBRC,
 		KC_LCTL,  KC_A,      KC_S,      KC_D,      KC_F,       KC_G,            KC_H,      KC_J,     KC_K,     KC_L,      KC_MV_SCLN, KC_QUOT,
-		KC_LSFT,  KC_Z,      KC_X,      KC_C,      KC_V,       KC_B,            KC_ESC_EN, KC_N,     KC_M,     KC_COMM,   KC_DOT,     KC_SLSH,  KC_ESC_EN,
+		KC_LSFT,  KC_Z,      KC_X,      KC_C,      KC_V,       KC_B,            KC_NO,     KC_N,     KC_M,     KC_COMM,   KC_DOT,     KC_SLSH,  KC_ESC_EN,
 		KC_LCTL,  KC_LALT,                        KC_LGUI,     M_SPC,	        M_ENT, ALT_T(KC_BSPC),                                KC_RGUI,  KC_RCTL
     ),
     [_MOVE] = LAYOUT(
@@ -47,7 +47,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 		KC_TRNS,  KC_TRNS,                         KC_TRNS,    KC_TRNS,	        KC_TRNS,   KC_TRNS,                                   KC_TRNS,  KC_TRNS
     ),
     [_SYMBOL] = LAYOUT(
-        KC_TRNS,  KC_EXLM,   KC_AT,     KC_HASH,   KC_DLR,     KC_PERC,         KC_CIRC,   KC_AMPR,  KC_ASTR,  KC_LPRN,   KC_RPRN,    KC_MINS,  KC_TRNS,
+        KC_TILD,  KC_EXLM,   KC_AT,     KC_HASH,   KC_DLR,     KC_PERC,         KC_CIRC,   KC_AMPR,  KC_ASTR,  KC_LPRN,   KC_RPRN,    KC_MINS,  KC_TRNS,
         KC_TRNS,  KC_TRNS,   KC_TRNS,   KC_TRNS,   KC_TRNS,    KC_TRNS,         KC_MINS,   KC_EQL,   KC_LCBR,  KC_RCBR,   KC_PIPE,    KC_GRV,
 		KC_TRNS,  KC_TRNS,   KC_TRNS,   KC_TRNS,   KC_TRNS,    KC_TRNS,         KC_TRNS,   KC_UNDS,  KC_PLUS,  KC_LBRC,   KC_RBRC,    KC_BSLS,  KC_TILD,
 		KC_TRNS,  KC_TRNS,                         KC_TRNS,    KC_TRNS,	        KC_PENT,   KC_TRNS,                                   KC_TRNS,  KC_TRNS
@@ -106,19 +106,49 @@ layer_state_t layer_state_set_user(layer_state_t state) {
     return state;
 }
 
+static bool ctrl_pressed = false;
+static bool exceptionaly_ctrl_layer_pressed = false;
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
-    switch (keycode) {
-        case KC_ESC_EN:
+  switch (keycode) {
+    case KC_LCTL:
+      if (record->event.pressed) {
+        ctrl_pressed = true;
+      } else {
+        ctrl_pressed = false;
+      }
+      break;
+    case KC_ESC_EN:
+      if (record->event.pressed) {
+        register_code(KC_ESC);
+        register_code(KC_LANG2);
+      } else {
+        unregister_code(KC_ESC);
+        unregister_code(KC_LANG2);
+      }
+      break;
+    default:
+      if (ctrl_pressed || exceptionaly_ctrl_layer_pressed) {
+        switch (keycode) {
+          case KC_H:
             if (record->event.pressed) {
-                register_code(KC_ESC);
-                register_code(KC_LANG2);
+              unregister_code(KC_LCTL);
+              register_code(KC_BSPC);
+              exceptionaly_ctrl_layer_pressed = true;
             } else {
-                unregister_code(KC_ESC);
-                unregister_code(KC_LANG2);
+              if (ctrl_pressed) {
+                register_code(KC_LCTL);
+              } else {
+                unregister_code(KC_LCTL);
+              }
+              unregister_code(KC_BSPC);
+              exceptionaly_ctrl_layer_pressed = false;
             }
+            return false;
             break;
-    }
-    return true;
+        }
+      }
+  }
+  return true;
 }
 
 const macro_t *action_get_macro(keyrecord_t *record, uint8_t id, uint8_t opt)

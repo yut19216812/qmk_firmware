@@ -1,235 +1,109 @@
+/*
+Copyright 2012 Jun Wako <wakojun@gmail.com>
+Copyright 2015 Jack Humbert
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 2 of the License, or
+(at your option) any later version.
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 #include QMK_KEYBOARD_H
-#ifdef PROTOCOL_LUFA
-  #include "lufa.h"
-  #include "split_util.h"
-#endif
-#ifdef SSD1306OLED
-  #include "ssd1306.h"
-#endif
-
-extern keymap_config_t keymap_config;
-
-extern uint8_t is_master;
 
 // Each layer gets a name for readability, which is then used in the keymap matrix below.
 // The underscores don't mean anything - you can have a layer called STUFF or any other name.
 // Layer names don't all need to be of the same length, obviously, and you can also skip them
 // entirely and just use numbers.
-// #define _QWERTY 0
-// #define _LOWER 1
-// #define _RAISE 2
+
+#define _BASE 0
+#define _MOVE 1
+#define _SYMBOL 2
+#define _ADJUST 3
+
+#define KC_MV_SCLN LT(_MOVE,  KC_SCLN)
+
+enum user_macro {
+  UM_SPC,
+  UM_ENT,
+};
 
 enum custom_keycodes {
-  QWERTY = SAFE_RANGE,
-  LOWER,
-  RAISE,
-  KC_ESC_EN,
-  KC_LANG_TGL,
+  KC_ESC_EN = SAFE_RANGE,
 };
 
-enum macro_keycodes {
-  KC_SAMPLEMACRO,
-  UM_EMHL,
-  UM_KHKR
-};
-
-// macro
-#define KC_M_EMHL MACROTAP(UM_EMHL) // 「Lower」キー用のキーコード
-#define KC_M_KHKR MACROTAP(UM_KHKR) // 「Raise」キー用のキーコード
-
-// common
-#define KC_ KC_TRNS
-#define KC_XXXX KC_NO
-#define KC_RST RESET
-#define KC_VD KC__VOLDOWN
-#define KC_VU KC__VOLUP
-
-// layer
-#define KC_L_LOWER LOWER
-#define KC_L_RAISE RAISE
-#define KC_L_S_JA LT(_LOWER, KC_S_JA)
-#define KC_R_S_EN LT(_RAISE, KC_S_EN)
-#define KC_R_SCLN LT(_RAISE, KC_SCLN) // tap: ;, 長押し: _RAISE
-#define KC_M_A LT(_RAISE, KC_A) // tap: A, 長押し: _RAISE
-
-// shift_t
-#define KC_S_SPC LSFT_T(KC_SPC)
-#define KC_S_ENT LSFT_T(KC_ENT)
-#define KC_S_TAB LSFT_T(KC_TAB)
-#define KC_S_ESC LSFT_T(KC_ESC)
-#define KC_S_JA LSFT_T(KC_LANG1)
-#define KC_S_EN LSFT_T(KC_LANG2)
-
-// cmd_t
-#define KC_M_F LCMD_T(KC_F)
-#define KC_M_D LCMD_T(KC_D)
-#define KC_M_J LCMD_T(KC_J)
-#define KC_M_K LCMD_T(KC_K)
-
-// ctl_t
-#define KC_C_S LCTL_T(KC_S)
-#define KC_C_L LCTL_T(KC_L)
-#define KC_C_BS LCTL_T(KC_BSPC)
-
-// alt_t
-#define KC_A_D ALT_T(KC_D)
-#define KC_A_K ALT_T(KC_K)
-#define KC_A_Z ALT_T(KC_Z)
-#define KC_A_SL ALT_T(KC_SLSH)
-#define KC_A_DEL ALT_T(KC_DEL)
-#define KC_A_BS ALT_T(KC_BSPC)
-
-// cmd+shift_t
-#define KC_MS_Q SCMD_T(KC_Q)
-#define KC_MS_A SCMD_T(KC_A)
-#define KC_MS_S SCMD_T(KC_S)
-#define KC_MS_SC SCMD_T(KC_SCLN)
-#define KC_MS_ESC SCMD_T(KC_ESC)
-
-//
-#define KC_MR RCMD(KC_R)
-#define KC_MF RCMD(KC_F)
-#define KC_MW RCMD(KC_W)
-#define KC_MX RCMD(KC_X)
-#define KC_MC RCMD(KC_C)
-#define KC_MV RCMD(KC_V)
-#define KC_MTAB RCMD(KC_TAB)
-#define KC_MSF RCMD(RSFT(KC_F))
-#define KC_MSR RCMD(RSFT(KC_R))
-#define KC_MST RCMD(RSFT(KC_T))
+#define M_SPC  MACROTAP(UM_SPC)
+#define M_ENT  MACROTAP(UM_ENT)
+#define ALT_BS ALT_T(KC_BSPC)
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
-  // M_ = LCMD_T(
-  // A_ = ALT_T(
-  // C_ = LCTL_T(
-  // MS_ = SMD_T(
-  // R_ = LT(_RAISE
-  // L_ = LT(_LOWER
-
-  [_QWERTY] = LAYOUT_kc( \
-  //,----+----+----+----+----+----.     ,----+----+----+----+----+----.
-     TAB,  Q  , W  , E  , R  , T  ,       Y  , U  , I  , O  , P  ,MINS,
-  //|----+----+----+----+----+----|     |----+----+----+----+----+----|
-     LCTL, A ,  S ,  D  , F ,  G  ,       H  , J  , K ,  L  , R_SCLN, QUOT,
-  //|----+----+----+----+----+----|     |----+----+----+----+----+----|
-     LSFT, Z  , X  , C  , V  , B  ,       N  , M  ,COMM,DOT ,SLSH,ESC_EN,
-  //`----+----+----+----+----+----/     \----+----+----+----+----+----'
-            LCMD,L_RAISE,S_SPC,S_EN,      S_JA,S_ENT,L_LOWER,A_BS
-  //          `----+----+----+----'     `----+----+----+---'
+  [_BASE] = LAYOUT( \
+  //,--------+--------+---------+--------+---------+--------.   ,--------+---------+--------+---------+--------+--------.
+      KC_TAB,  KC_Q,    KC_W,    KC_E,    KC_R,    KC_T,          KC_Y,    KC_U,    KC_I,    KC_O,    KC_P,   KC_BSPC,
+  //|--------+--------+---------+--------+---------+--------|   |--------+---------+--------+---------+--------+--------|
+      KC_LCTL, KC_A,    KC_S,    KC_D,    KC_F,    KC_G,          KC_H,    KC_J,    KC_K,    KC_L,    KC_MV_SCLN, KC_QUOT,
+  //|--------+--------+---------+--------+---------+--------|   |--------+---------+--------+---------+--------+--------|
+      KC_LSFT, KC_Z,    KC_X,    KC_C,    KC_V,    KC_B,          KC_N,    KC_M,    KC_COMM, KC_DOT,  KC_SLSH,   KC_ESC,
+  //`--------+--------+---------+--------+---------+--------/   \--------+---------+--------+---------+--------+--------'
+                        KC_LGUI, M_SPC, KC_LSFT, KC_LANG2,        KC_LANG1, KC_RSFT, M_ENT,  ALT_BS
+  //                 `----------+--------+---------+--------'   `--------+---------+--------+---------'
+  ),
+  [_MOVE] = LAYOUT( \
+    //,--------+--------+---------+--------+---------+--------.   ,--------+---------+--------+---------+--------+--------.
+      KC_TRNS, KC_6,    KC_7,    KC_8,    KC_9,    KC_0,    KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,  KC_TRNS, KC_TRNS,
+    //|--------+--------+---------+--------+---------+--------|   |--------+---------+--------+---------+--------+--------|
+      KC_TRNS, KC_1,    KC_2,    KC_3,    KC_4,    KC_5,    KC_LEFT, KC_DOWN, KC_UP,   KC_RIGHT, KC_TRNS, KC_TRNS,
+    //|--------+--------+---------+--------+---------+--------|   |--------+---------+--------+---------+--------+--------|
+      KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,  KC_TRNS, KC_TRNS,
+  //`--------+--------+---------+--------+---------+--------/   \--------+---------+--------+---------+--------+--------'
+                        KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,        KC_TRNS, KC_TRNS, KC_TRNS,  KC_TRNS
+  //                 `----------+--------+---------+--------'   `--------+---------+--------+---------'
   ),
 
-  [_RAISE] = LAYOUT_kc( \
-  //,----+----+----+----+----+----.     ,----+----+----+----+----+----.
-         , 6  , 7  , 8  , 9  , 0  ,          ,    ,    ,    , UP ,    ,
-  //|----+----+----+----+----+----|     |----+----+----+----+----+----|
-     LCTL, 1  , 2  , 3  , 4  , 5  ,      LEFT,DOWN, UP, RGHT,    ,    ,
-  //|----+----+----+----+----+----|     |----+----+----+----+----+----|
-     LSFT,    ,    ,    ,    ,    ,      DOWN,    ,    ,    ,    ,    ,
-  //`----+----+----+--+-+----+----/     \----+----+----+----+----+----'
-            LCMD,L_RAISE,S_SPC,S_EN,     S_JA,S_ENT,L_LOWER,A_BS
-  //          `----+----+----+----'     `----+----+----+----'
+  [_SYMBOL] = LAYOUT( \
+  //,--------+--------+---------+--------+---------+--------.   ,--------+---------+--------+---------+--------+--------.
+    KC_TILD, KC_EXLM, KC_AT,   KC_HASH, KC_DLR,  KC_PERC, KC_CIRC, KC_AMPR, KC_ASTR, KC_LPRN, KC_RPRN, KC_MINS,
+  //|--------+--------+---------+--------+---------+--------|   |--------+---------+--------+---------+--------+--------|
+    KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_MINS, KC_EQL,  KC_LCBR, KC_RCBR, KC_PIPE, KC_GRV,
+  //|--------+--------+---------+--------+---------+--------|   |--------+---------+--------+---------+--------+--------|
+    KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_UNDS, KC_PLUS, KC_LBRC, KC_RBRC, KC_BSLS, KC_TILD,
+  //`--------+--------+---------+--------+---------+--------/   \--------+---------+--------+---------+--------+--------'
+                  KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,        KC_TRNS, KC_TRNS, KC_TRNS,  KC_TRNS
+  //                 `----------+--------+---------+--------'   `--------+---------+--------+---------'
   ),
 
-  [_LOWER] = LAYOUT_kc( \
-  //,----+----+----+----+----+----.     ,----+----+----+----+----+----.
-         ,EXLM, AT ,HASH,DLR ,PERC,      CIRC,AMPR,ASTR,LPRN,RPRN,MINS,
-  //|----+----+----+----+----+----|     |----+----+----+----+----+----|
-     LCTL,    ,    ,    ,    ,    ,      MINS,EQL ,LCBR,RCBR,PIPE,GRV ,
-  //|----+----+----+----+----+----|     |----+----+----+----+----+----|
-     LSFT,    ,    ,    ,    ,    ,      UNDS,PLUS,LBRC,RBRC,BSLS,TILD,
-  //|----+----+----+----+----+----|     |----+----+----+----+----+----|
-            LCMD,L_RAISE,S_SPC,S_EN,     S_JA,S_ENT,L_LOWER,A_BS
-  //          `----+----+----+----'     `----+----+----+----'
-  ),
-
+  [_ADJUST] = LAYOUT( \
+  //,--------+--------+---------+--------+---------+--------.   ,--------+---------+--------+---------+--------+--------.
+  KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,    KC_F6,   KC_F7,   KC_F8,    KC_F9,   KC_F10,  KC_F11,  KC_F12,
+  //|--------+--------+---------+--------+---------+--------|   |--------+---------+--------+---------+--------+--------|
+  KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_LANG2, KC_TRNS, KC_TRNS, KC_LANG1, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,
+  //|--------+--------+---------+--------+---------+--------|   |--------+---------+--------+---------+--------+--------|
+  KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,  KC_TRNS, KC_TRNS, KC_TRNS,  KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,
+  //`--------+--------+---------+--------+---------+--------/   \--------+---------+--------+---------+--------+--------'
+                        KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,        KC_TRNS, KC_TRNS, KC_TRNS,  KC_TRNS
+  //                 `----------+--------+---------+--------'   `--------+---------+--------+---------'
+  )
 };
 
-void matrix_init_user(void) {
-  //SSD1306 OLED init, make sure to add #define SSD1306OLED in config.h
-  #ifdef SSD1306OLED
-    iota_gfx_init(!has_usb());   // turns on the display
-  #endif
+layer_state_t layer_state_set_user(layer_state_t state) {
+  return update_tri_layer_state(state, _MOVE, _SYMBOL, _ADJUST);
 }
 
-//SSD1306 OLED update loop, make sure to add #define SSD1306OLED in config.h
-#ifdef SSD1306OLED
-
-// When add source files to SRC in rules.mk, you can use functions.
-const char *read_layer_state(void);
-const char *read_logo(void);
-void set_keylog(uint16_t keycode, keyrecord_t *record);
-const char *read_keylog(void);
-const char *read_keylogs(void);
-
-// const char *read_mode_icon(bool swap);
-// const char *read_host_led_state(void);
-// void set_timelog(void);
-// const char *read_timelog(void);
-
-void matrix_scan_user(void) {
-  iota_gfx_task();
-}
-
-void matrix_render_user(struct CharacterMatrix *matrix) {
-  if (is_master) {
-    // If you want to change the display of OLED, you need to change here
-    matrix_write_ln(matrix, read_layer_state());
-    matrix_write_ln(matrix, read_keylog());
-    // matrix_write_ln(matrix, read_keylogs());
-    //matrix_write_ln(matrix, read_mode_icon(keymap_config.swap_lalt_lgui));
-    //matrix_write_ln(matrix, read_host_led_state());
-    //matrix_write_ln(matrix, read_timelog());
-  } else {
-    matrix_write(matrix, read_logo());
-  }
-}
-
-void matrix_update(struct CharacterMatrix *dest, const struct CharacterMatrix *source) {
-  if (memcmp(dest->display, source->display, sizeof(dest->display))) {
-    memcpy(dest->display, source->display, sizeof(dest->display));
-    dest->dirty = true;
-  }
-}
-
-void iota_gfx_task_user(void) {
-  struct CharacterMatrix matrix;
-  matrix_clear(&matrix);
-  matrix_render_user(&matrix);
-  matrix_update(&display, &matrix);
-}
-#endif//SSD1306OLED
-
+static bool ctrl_pressed = false;
+static bool exceptionaly_ctrl_layer_pressed = false;
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
-  if (record->event.pressed) {
-#ifdef SSD1306OLED
-    set_keylog(keycode, record);
-#endif
-    // set_timelog();
-  }
-
   switch (keycode) {
-    case QWERTY:
+    case KC_LCTL:
       if (record->event.pressed) {
-        set_single_persistent_default_layer(_QWERTY);
-      }
-      return false;
-      break;
-    case LOWER:
-      if (record->event.pressed) {
-        layer_on(_LOWER);
+        ctrl_pressed = true;
       } else {
-        layer_off(_LOWER);
+        ctrl_pressed = false;
       }
-      return false;
-      break;
-    case RAISE:
-      if (record->event.pressed) {
-        layer_on(_RAISE);
-      } else {
-        layer_off(_RAISE);
-      }
-      return false;
       break;
     case KC_ESC_EN:
       if (record->event.pressed) {
@@ -240,23 +114,40 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         unregister_code(KC_LANG2);
       }
       return false;
-    case KC_LANG_TGL:
-      if (record->event.pressed) {
-        SEND_STRING(SS_LCTRL(" "));
+    default:
+      if (ctrl_pressed || exceptionaly_ctrl_layer_pressed) {
+        switch (keycode) {
+          case KC_H:
+            if (record->event.pressed) {
+              unregister_code(KC_LCTL);
+              register_code(KC_BSPC);
+              exceptionaly_ctrl_layer_pressed = true;
+            } else {
+              if (ctrl_pressed) {
+                register_code(KC_LCTL);
+              } else {
+                unregister_code(KC_LCTL);
+              }
+              unregister_code(KC_BSPC);
+              exceptionaly_ctrl_layer_pressed = false;
+            }
+            return false;
+            break;
+        }
       }
-      return false;
   }
   return true;
 }
 
-const macro_t *action_get_macro(keyrecord_t *record, uint8_t id, uint8_t opt)
-{
+const macro_t *action_get_macro(keyrecord_t *record, uint8_t id, uint8_t opt) {
   switch(id) {
-    case UM_EMHL: // タップで「英数」と「無変換」、ホールドで「Lower」
-      return MACRO_TAP_HOLD_LAYER( record, MACRO(T(MHEN), T(LANG1), END), _LOWER );
-    case UM_KHKR: // タップで「かな」と「変換」、ホールドで「Raise」
-      return MACRO_TAP_HOLD_LAYER( record, MACRO(T(HENK), T(LANG2), END), _RAISE );
-  };
-  return MACRO_NONE;
-}
+    case UM_SPC: {
+      return MACRO_TAP_HOLD_LAYER( record, MACRO(TYPE(KC_SPC), END), _MOVE );
+    } break;
 
+    case UM_ENT: {
+      return MACRO_TAP_HOLD_LAYER( record, MACRO(TYPE(KC_ENT), END), _SYMBOL );
+    } break;
+  }
+  return MACRO_NONE;
+};
