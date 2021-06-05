@@ -21,4 +21,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #pragma once
 
 #define MASTER_LEFT
-#define TAPPING_TERM 140
+#define OLED_FONT_H "keyboards/claw44/lib/glcdfont.c"
+// #define COMBO_COUNT 1
+
+// #undef TAPPING_TERM
+// #define TAPPING_TERM 170
+// #define PERMISSIVE_HOLD
+// #define RETRO_TAPPING
