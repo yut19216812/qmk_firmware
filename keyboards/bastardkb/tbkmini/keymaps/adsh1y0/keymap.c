@@ -39,6 +39,10 @@ enum layer_names {
 enum original_keycodes {
   KC_ESC_EN = SAFE_RANGE,
   YBI_WIN_FRONT,
+  YBI_WIN_LEFT,
+  YBI_WIN_RIGHT,
+  YBI_WIN_UP,
+  YBI_WIN_DOWN,
 };
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
@@ -57,7 +61,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
     [_L1] = LAYOUT_split_3x6_3(
         //,-----------------------------------------------------.                    ,-----------------------------------------------------.
-        KC_TRNS, KC_6,    KC_7,    KC_8,    KC_9,    KC_0,                            _______, _______, _______, _______,  _______, _______,
+        KC_TRNS, KC_6,    KC_7,    KC_8,    KC_9,    KC_0,                            YBI_WIN_LEFT, YBI_WIN_DOWN, YBI_WIN_UP, YBI_WIN_RIGHT,  _______, _______,
         //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
         KC_TRNS, KC_1,    KC_2,    KC_3,    KC_4,    KC_5,                            KC_LEFT, KC_DOWN, KC_UP,   KC_RIGHT, _______, _______,
         //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
@@ -76,7 +80,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
         KC_TRNS,  _______, KC_LBRC, KC_QUOT, KC_RBRC, _______,                         KC_UNDS, KC_PLUS, KC_LBRC, KC_RBRC, KC_BSLS, KC_TILD,
         //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
-        KC_LGUI, MO(_L3), SFT_SPC,      SFT_ENT,  MO(_L3), ALT_BS 
+        KC_LGUI, MO(_L3), SFT_SPC,      SFT_ENT,  MO(_L3), ALT_BS
         //`--------------------------'  `--------------------------'
         ),
 
@@ -84,11 +88,11 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         //,-----------------------------------------------------.                    ,-----------------------------------------------------.
         KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,   KC_F6,                            KC_F7,   KC_F8,   KC_F9,   KC_F10,  KC_F11,  KC_F12,
         //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
-        KC_TRNS, _______, _______, _______, KC_LNG2, YBI_WIN_FRONT,                    _______, KC_LNG1, _______, _______, _______, _______,
+        KC_TRNS, _______, _______, _______, YBI_WIN_FRONT, KC_LNG2,                    KC_LNG1, _______, _______, _______, _______, _______,
         //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
         KC_TRNS, _______, _______, _______, _______, _______,                          _______, _______, _______, _______, _______, _______,
         //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
-        KC_TRNS, KC_TRNS, KC_TRNS,       KC_TRNS, KC_TRNS, MO(_L4) 
+        KC_TRNS, KC_TRNS, KC_TRNS,       KC_TRNS, KC_TRNS, MO(_L4)
         //`--------------------------'  `--------------------------'
         ),
 
@@ -125,6 +129,46 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         unregister_code(KC_LSFT);
         unregister_code(KC_LALT);
         unregister_code(KC_SPACE);
+      }
+      return false;
+      break;
+    case YBI_WIN_LEFT:
+      if (record->event.pressed) {
+        register_code(KC_LALT);
+        register_code(KC_H);
+      } else {
+        unregister_code(KC_LALT);
+        unregister_code(KC_H);
+      }
+      return false;
+      break;
+    case YBI_WIN_RIGHT:
+      if (record->event.pressed) {
+        register_code(KC_LALT);
+        register_code(KC_L);
+      } else {
+        unregister_code(KC_LALT);
+        unregister_code(KC_L);
+      }
+      return false;
+      break;
+    case YBI_WIN_UP:
+      if (record->event.pressed) {
+        register_code(KC_LALT);
+        register_code(KC_K);
+      } else {
+        unregister_code(KC_LALT);
+        unregister_code(KC_K);
+      }
+      return false;
+      break;
+    case YBI_WIN_DOWN:
+      if (record->event.pressed) {
+        register_code(KC_LALT);
+        register_code(KC_J);
+      } else {
+        unregister_code(KC_LALT);
+        unregister_code(KC_J);
       }
       return false;
       break;
