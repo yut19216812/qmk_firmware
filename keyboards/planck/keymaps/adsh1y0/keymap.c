@@ -17,8 +17,8 @@
 #include QMK_KEYBOARD_H
 #include "muse.h"
 
-enum planck_layers {
-  _QWERTY,
+enum planck_layer {
+  _DEFALUT,
   _LOWER,
   _RAISE,
   _T1,
@@ -46,7 +46,7 @@ enum planck_keycodes {
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
-/* Qwerty
+/* Default
  * ,-----------------------------------------------------------------------------------.
  * | Tab  |   Q  |   W  |   E  |   R  |   T  |   Y  |   U  |   I  |   O  |   P  | Bksp |
  * |------+------+------+------+------+------+------+------+------+------+------+------|
@@ -57,11 +57,11 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * | Brite| Ctrl | Alt  | GUI  |Lower |    Space    |Raise | Left | Down | MGR  |Raise |
  * `-----------------------------------------------------------------------------------'
  */
-[_QWERTY] = LAYOUT_planck_grid(
-    KC_TAB,  KC_Q,    KC_W,    KC_E,    KC_R,      KC_T,    KC_Y,     KC_U,   KC_I,    KC_O,    KC_P,       KC_BSPC,
-    KC_LCTL, KC_A,    KC_S,    KC_D,    KC_F,      KC_G,    KC_H,     KC_J,   KC_K,    KC_L,    KC_MV_SCLN, KC_QUOT,
-    KC_LSFT, KC_Z,    KC_X,    KC_C,    KC_V,      KC_B,    KC_N,     KC_M,   KC_COMM, KC_DOT,  KC_SLSH,    KC_ESC_EN,
-    _______, KC_LCTL, KC_TAB,  KC_LGUI, LT_SPC,   SFT_SPC, SFT_ENT,  LT_ENT, ALT_BS, KC_ESC_EN, KC_RCTL,  _______
+[_DEFALUT] = LAYOUT_planck_grid(
+    KC_TAB,   KC_Q,     KC_W,    KC_E,     KC_R,      KC_T,     KC_Y,      KC_U,    KC_I,     KC_O,       KC_P,        KC_BSPC,
+    KC_LCTL,  KC_A,     KC_S,    KC_D,     KC_F,      KC_G,     KC_H,      KC_J,    KC_K,     KC_L,       KC_MV_SCLN,  KC_ENT,
+    KC_LSFT,  KC_Z,     KC_X,    KC_C,     KC_V,      KC_B,     KC_N,      KC_M,    KC_COMM,  KC_DOT,     KC_SLSH,     KC_ESC_EN,
+    _______,  KC_LCTL,  KC_TAB,  KC_LGUI,  LT_SPC,    SFT_SPC,  SFT_SPC,   LT_ENT,  ALT_BS,   KC_ESC_EN,  KC_RCTL,     _______
 ),
 
 /* Move
@@ -76,10 +76,10 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 * `-----------------------------------------------------------------------------------'
 */
 [_T1] = LAYOUT_planck_grid(
-    KC_TRNS, KC_6, KC_7, KC_8, KC_9, KC_0, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,
-    KC_TRNS, KC_1, KC_2, KC_3, KC_4, KC_5, KC_LEFT, KC_DOWN, KC_UP, KC_RIGHT, KC_TRNS, KC_TRNS,
-    KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,
-    KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS
+    KC_TRNS,  _______,  KC_7,     KC_8,     KC_9,      KC_0,     _______,   _______,  _______,  _______,   _______,  KC_TRNS,
+    KC_TRNS,  _______,  KC_4,     KC_5,     KC_6,      _______,  KC_LEFT,   KC_DOWN,  KC_UP,    KC_RIGHT,  KC_TRNS,  KC_TRNS,
+    KC_TRNS,  _______,  KC_1,     KC_2,     KC_3,      _______,  _______,   _______,  _______,  _______,   _______,  KC_TRNS,
+    KC_TRNS,  KC_TRNS,  KC_TRNS,  KC_TRNS,  KC_TRNS,   KC_TRNS,  KC_TRNS,   KC_TRNS,  KC_TRNS,  KC_TRNS,   KC_TRNS,  KC_TRNS
 ),
 
 /* Symbol
@@ -94,10 +94,10 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 * `-----------------------------------------------------------------------------------'
 */
 [_T2] = LAYOUT_planck_grid(
-    KC_TILD, KC_EXLM, KC_AT,   KC_HASH, KC_DLR,  KC_PERC, KC_CIRC, KC_AMPR, KC_ASTR, KC_LPRN, KC_RPRN, KC_MINS,
-    KC_TRNS, KC_TRNS, KC_LCBR, KC_DQT,  KC_RCBR, KC_TRNS, KC_MINS, KC_EQL,  KC_LCBR, KC_RCBR, KC_PIPE, KC_GRV,
-    KC_TRNS, KC_TRNS, KC_LBRC, KC_QUOT, KC_RBRC, KC_TRNS, KC_UNDS, KC_PLUS, KC_LBRC, KC_RBRC, KC_BSLS, KC_TILD,
-    KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS
+    KC_TILD,  KC_EXLM,  KC_AT,    KC_HASH,  KC_DLR,   KC_PERC,  KC_CIRC,  KC_AMPR,  KC_ASTR,  KC_LPRN,  KC_RPRN,  KC_MINS,
+    KC_TRNS,  KC_TRNS,  KC_LCBR,  KC_DQT,   KC_RCBR,  KC_TRNS,  KC_MINS,  KC_EQL,   KC_LCBR,  KC_RCBR,  KC_PIPE,  KC_GRV,
+    KC_TRNS,  KC_TRNS,  KC_LBRC,  KC_QUOT,  KC_RBRC,  KC_TRNS,  KC_UNDS,  KC_PLUS,  KC_LBRC,  KC_RBRC,  KC_BSLS,  KC_TILD,
+    KC_TRNS,  KC_TRNS,  KC_TRNS,  KC_TRNS,  KC_TRNS,  KC_TRNS,  KC_TRNS,  KC_TRNS,  KC_TRNS,  KC_TRNS,  KC_TRNS,  KC_TRNS
 ),
 
 /* Lower
@@ -113,8 +113,8 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  */
 [_LOWER] = LAYOUT_planck_grid(
     KC_TILD, KC_EXLM, KC_AT, KC_HASH, KC_DLR, KC_PERC, KC_CIRC, KC_AMPR, KC_ASTR, KC_LPRN, KC_RPRN, KC_BSPC,
-    KC_DEL, KC_F1, KC_F2, KC_F3, KC_F4, KC_F5, KC_F6, KC_UNDS, KC_PLUS, KC_LCBR, KC_RCBR, KC_PIPE,
-    _______, KC_F7, KC_F8, KC_F9, KC_F10, KC_F11, KC_F12, S(KC_NUHS), S(KC_NUBS), KC_HOME, KC_END, _______,
+    KC_DEL,  KC_F1,   KC_F2, KC_F3,   KC_F4,  KC_F5,   KC_F6,   KC_UNDS, KC_PLUS, KC_LCBR, KC_RCBR, KC_PIPE,
+    _______, KC_F7,   KC_F8, KC_F9,   KC_F10, KC_F11,  KC_F12,  KC_NUHS, KC_NUBS, KC_HOME, KC_END, _______,
     _______, _______, _______, _______, _______, _______, _______, _______, KC_MNXT, KC_VOLD, KC_VOLU, KC_MPLY
 ),
 
@@ -130,7 +130,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * `-----------------------------------------------------------------------------------'
  */
 [_RAISE] = LAYOUT_planck_grid(
-    KC_GRV,  KC_1, KC_2,  KC_3,  KC_4, KC_5, KC_6, KC_7, KC_8, KC_9, KC_0, KC_BSPC,
+    KC_GRV, KC_1,  KC_2,  KC_3,  KC_4,  KC_5,  KC_6,  KC_7,    KC_8,   KC_9,    KC_0,    KC_BSPC,
     KC_DEL, KC_F1, KC_F2, KC_F3, KC_F4, KC_F5, KC_F6, KC_MINS, KC_EQL, KC_LBRC, KC_RBRC, KC_BSLS,
     _______,KC_F7, KC_F8, KC_F9, KC_F10, KC_F11, KC_F12, KC_NUHS, KC_NUBS, KC_PGUP, KC_PGDN, _______,
     _______, _______, _______, _______, _______, _______, _______, _______, KC_MNXT, KC_VOLD, KC_VOLU, KC_MPLY
@@ -148,10 +148,10 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 * `-----------------------------------------------------------------------------------'
 */
 [_ADJUST] = LAYOUT_planck_grid(
-    KC_F1, KC_F2, KC_F3, KC_F4, KC_F5, KC_F6, KC_F7, KC_F8, KC_F9, KC_F10, KC_F11, KC_F12,
+    KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,   KC_F6,   KC_F7,   KC_F8,   KC_F9,   KC_F10,  KC_F11,  KC_F12,
     KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_LNG2, KC_TRNS, KC_TRNS, KC_LNG1, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,
     KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,
-    KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, MGR
+    KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, MGR,     KC_TRNS
 ),
 
 /* Adjust (Lower + Raise)
@@ -189,7 +189,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     case QWERTY:
       if (record->event.pressed) {
         print("mode just switched to qwerty and this is a huge string\n");
-        set_single_persistent_default_layer(_QWERTY);
+        set_single_persistent_default_layer(_DEFALUT);
       }
       return false;
       break;
